@@ -2,6 +2,8 @@ using DbContext;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
 using RepositoryContracts;
+using ServiceContracts;
+using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +18,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services
     .AddScoped<IVehiculoRepository, VehiculoRepository>()
-    .AddScoped<IReservaRepository, ReservaRepository>();
+    .AddScoped<IReservaRepository, ReservaRepository>()
+    .AddScoped<IVehiculoService, VehiculoService>();
 
 var app = builder.Build();
 
