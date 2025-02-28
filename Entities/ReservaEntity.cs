@@ -10,13 +10,13 @@
         public int Id { get; set; }
 
         [Required]
-        public string CedulaCliente { get; set; } = null!;
-        [ForeignKey(nameof(CedulaCliente))]
-        public ClienteEntity Cliente { get; set; } = null!;
+        public string CedulaUsuario { get; set; } = null!;
+        [ForeignKey(nameof(CedulaUsuario))]
+        public UsuarioEntity Cliente { get; set; } = null!;
 
         [Required]
-        public int IdVehiculo { get; set; }
-        [ForeignKey(nameof(IdVehiculo))]
+        public string PlacaVehiculo { get; set; } = null!;
+        [ForeignKey(nameof(PlacaVehiculo))]
         public VehiculoEntity Vehiculo { get; set; } = null!;
 
         [Required]

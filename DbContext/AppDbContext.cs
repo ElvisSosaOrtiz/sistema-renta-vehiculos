@@ -1,12 +1,21 @@
 ﻿namespace DbContext
 {
-    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+    using DbContext.Configuration;
+    using Entities;
     using Microsoft.EntityFrameworkCore;
 
-    public class AppDbContext : IdentityDbContext
+    public class AppDbContext(DbContextOptions options) : DbContext(options)
     {
-        public AppDbContext(DbContextOptions options) : base(options)
+        public DbSet<VehiculoEntity> Vehiculos { get; set; }
+        public DbSet<EstadoVehiculoEntity> EstadosVehiculo { get; set; }
+        public DbSet<UsuarioEntity> Usuarios { get; set; }
+        public DbSet<ReservaEntity> Reservas { get; set; }
+        public DbSet<EstadoReservaEntity> EstadosReserva { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new EstadoVehiculoConfiguration());
+            modelBuilder.ApplyConfiguration(new EstadoReservaConfiguration());
         }
     }
 }

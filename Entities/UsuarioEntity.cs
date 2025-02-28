@@ -3,8 +3,8 @@
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    [Table("Administrador")]
-    public class AdministradorEntity
+    [Table("Usuario")]
+    public class UsuarioEntity
     {
         [Key]
         [Required]
@@ -15,6 +15,13 @@
 
         [Required]
         public string Apellido { get; set; } = null!;
+
+        [Required]
+        [DataType(DataType.PhoneNumber)]
+        public string Telefono { get; set; } = null!;
+
+        [Required]
+        public string Direccion { get; set; } = null!;
 
         [Required]
         [DataType(DataType.EmailAddress)]
