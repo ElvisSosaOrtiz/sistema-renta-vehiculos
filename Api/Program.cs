@@ -19,7 +19,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services
     .AddScoped<IVehiculoRepository, VehiculoRepository>()
     .AddScoped<IReservaRepository, ReservaRepository>()
-    .AddScoped<IVehiculoService, VehiculoService>();
+    .AddScoped<IVehiculoService, VehiculoService>()
+    .AddScoped<IReservaService, ReservaService>();
 
 var app = builder.Build();
 

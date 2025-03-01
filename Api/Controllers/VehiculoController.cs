@@ -51,7 +51,7 @@
         {
             var result = await _vehiculoService.UpdateVehiculoAsync(placa, request);
 
-            if (result is null) return BadRequest("No se pudo modificar el vehículo");
+            if (result is null) return BadRequest("No se pudo modificar el vehículo o no fue encontrado");
 
             return Ok(result);
         }

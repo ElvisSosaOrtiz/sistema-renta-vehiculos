@@ -100,6 +100,14 @@
         {
             try
             {
+                var existingVehiculo = await _vehiculoRepository.GetVehiculoAsync(request.Placa);
+
+                if (existingVehiculo is not null)
+                {
+                    _logger.LogError("Vehiculo already exists");
+                    return null;
+                }
+
                 var vehiculoEntity = new VehiculoEntity
                 {
                     Placa = request.Placa,
@@ -182,15 +190,15 @@
         {
             try
             {
-                var vehiculoEntity = await _vehiculoRepository.GetVehiculoAsync(placa);
+                var vehiculo = await _vehiculoRepository.GetVehiculoAsync(placa);
 
-                if (vehiculoEntity is null)
+                if (vehiculo is null)
                 {
                     _logger.LogError("Could not find vehiculo to delete");
                     return;
                 }
 
-                await _vehiculoRepository.RemoveVehiculoAsync(vehiculoEntity);
+                await _vehiculoRepository.RemoveVehiculoAsync(vehiculo);
             }
             catch (Exception ex)
             {

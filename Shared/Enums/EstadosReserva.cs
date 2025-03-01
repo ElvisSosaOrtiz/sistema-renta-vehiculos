@@ -2,8 +2,8 @@
 {
     public enum EstadosReserva
     {
-        Confirmada,
-        Cancelada,
-        Finalizada
+        Confirmada = 1,
+        Cancelada = 2,
+        Finalizada = 3
     }
 }

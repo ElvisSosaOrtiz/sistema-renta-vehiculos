@@ -25,6 +25,10 @@
         public EstadoReservaEntity EstadoReseva { get; set; } = null!;
 
         [Required]
+        [DataType(DataType.Currency)]
+        public float CostoTotal { get; set; }
+
+        [Required]
         [DataType(DataType.Date)]
         public DateOnly FechaInicio { get; set; }
 
