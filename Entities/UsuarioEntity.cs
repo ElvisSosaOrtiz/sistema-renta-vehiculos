@@ -1,12 +1,12 @@
 ﻿namespace Entities
 {
+    using Microsoft.AspNetCore.Identity;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
     [Table("Usuario")]
-    public class UsuarioEntity
+    public class UsuarioEntity : IdentityUser
     {
-        [Key]
         [Required]
         public string Cedula { get; set; } = null!;
 
@@ -17,14 +17,9 @@
         public string Apellido { get; set; } = null!;
 
         [Required]
-        [DataType(DataType.PhoneNumber)]
-        public string Telefono { get; set; } = null!;
-
-        [Required]
         public string Direccion { get; set; } = null!;
 
-        [Required]
-        [DataType(DataType.EmailAddress)]
-        public string Correo { get; set; } = null!;
+        public string? RefreshToken { get; set; }
+        public DateTime RefreshTokenExpiryTime { get; set; }
     }
 }

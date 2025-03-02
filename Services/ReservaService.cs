@@ -12,13 +12,16 @@
     public class ReservaService : IReservaService
     {
         private readonly IReservaRepository _reservaRepository;
+        private readonly IVehiculoRepository _vehiculoRepository;
         private readonly ILogger<ReservaService> _logger;
 
         public ReservaService(
             IReservaRepository reservaRepository,
+            IVehiculoRepository vehiculoRepository,
             ILogger<ReservaService> logger)
         {
             _reservaRepository = reservaRepository;
+            _vehiculoRepository = vehiculoRepository;
             _logger = logger;
         }
 
@@ -33,18 +36,18 @@
                 return new()
                 {
                     Reservas = reservas
-                        .Where(reserva => reserva.CedulaUsuario == cedula)
-                        .Select(reserva => new ResponseOfGetReservas.Reserva
-                    {
+                        .Where(reserva => reserva.Cliente.Cedula == cedula)
+                        .Select(reserva => new Reserva
+                        {
                         Id = reserva.Id,
                         Cliente = new()
                         {
-                            Cedula = reserva.CedulaUsuario,
+                            Cedula = reserva.Cliente.Cedula,
                             Nombre = reserva.Cliente.Nombre,
                             Apellido = reserva.Cliente.Apellido,
-                            Telefono = reserva.Cliente.Telefono,
+                            Telefono = reserva.Cliente.PhoneNumber!,
                             Direccion = reserva.Cliente.Direccion,
-                            Correo = reserva.Cliente.Correo
+                            Correo = reserva.Cliente.Email!
                         },
                         Vehiculo = new()
                         {
@@ -86,12 +89,12 @@
                     Id = reserva.Id,
                     Cliente = new()
                     {
-                        Cedula = reserva.CedulaUsuario,
+                        Cedula = reserva.Cliente.Cedula,
                         Nombre = reserva.Cliente.Nombre,
                         Apellido = reserva.Cliente.Apellido,
-                        Telefono = reserva.Cliente.Telefono,
+                        Telefono = reserva.Cliente.PhoneNumber!,
                         Direccion = reserva.Cliente.Direccion,
-                        Correo = reserva.Cliente.Correo
+                        Correo = reserva.Cliente.Email!
                     },
                     Vehiculo = new()
                     {
@@ -115,12 +118,19 @@
             }
         }
 
-        public async Task<Reserva?> CreateReservaAsync(RequestOfCreateReserva request)
+        public async Task<Reserva?> CreateReservaAsync(RequestOfCreateReserva request, string cedula, string userId)
         {
             try
             {
-                var existingReserva = GetReservas(request.CedulaCliente)?.Reservas
+                var existingReserva = GetReservas(cedula)?.Reservas
                     .FirstOrDefault(reserva => reserva.Vehiculo.Placa == request.PlacaVehiculo);
+
+                var vehiculo = await _vehiculoRepository.GetVehiculoAsync(request.PlacaVehiculo);
+                if (vehiculo is null)
+                {
+                    _logger.LogError("This vehiculo does not exist");
+                    return null;
+                }
 
                 if (existingReserva is not null)
                 {
@@ -128,21 +138,21 @@
                     return null;
                 }
 
-                if (Convert.ToDateTime(request.FechaInicio) > DateTime.Today)
+                if (request.FechaInicio.ToDateTime(TimeOnly.FromDateTime(DateTime.Now)) <= DateTime.Now)
                 {
                     _logger.LogError("FechaInicio should be greater than today");
                     return null;
                 }
 
-                if (Convert.ToDateTime(request.FechaFin) > DateTime.Today && request.FechaFin > request.FechaInicio)
+                if (request.FechaFin <= request.FechaInicio)
                 {
-                    _logger.LogError("FechaFin should be greater than today and greater than FechaInicio");
+                    _logger.LogError("FechaFin should be greater than FechaInicio");
                     return null;
                 }
 
                 var reservaEntity = new ReservaEntity
                 {
-                    CedulaUsuario = request.CedulaCliente,
+                    UserId = userId,
                     PlacaVehiculo = request.PlacaVehiculo,
                     IdEstadoReserva = (int)request.EstadoReserva,
                     CostoTotal = request.CostoTotal,
@@ -161,7 +171,7 @@
                 return new()
                 {
                     Id = reserva.Id,
-                    Cliente = new() { Cedula = reserva.CedulaUsuario },
+                    Cliente = new() { Cedula = cedula },
                     Vehiculo = new() { Placa = reserva.PlacaVehiculo },
                     Estado = (EstadosReserva)reserva.IdEstadoReserva,
                     CostoTotal = reserva.CostoTotal,
@@ -188,11 +198,20 @@
                     return null;
                 }
 
-                if (!string.IsNullOrEmpty(request.CedulaCliente)) reservaEntity.CedulaUsuario = request.CedulaCliente;
-                if (!string.IsNullOrEmpty(request.PlacaVehiculo)) reservaEntity.PlacaVehiculo = request.PlacaVehiculo;
-                if (request.EstadoReserva > 0) reservaEntity.IdEstadoReserva = (int)request.EstadoReserva;
-                if (Convert.ToDateTime(request.FechaInicio) > DateTime.Today) reservaEntity.FechaInicio = request.FechaInicio;
-                if (Convert.ToDateTime(request.FechaFin) > DateTime.Today && request.FechaFin > request.FechaInicio) reservaEntity.FechaFin = request.FechaFin;
+                if (request.FechaInicio.ToDateTime(TimeOnly.FromDateTime(DateTime.Now)) <= DateTime.Today || request.FechaInicio >= request.FechaFin)
+                {
+                    _logger.LogError("FechaInicio cannot be less or equal than Today or greater or equal than FechaFin");
+                    return null;
+                } 
+
+                if (request.FechaFin <= request.FechaInicio)
+                {
+                    _logger.LogError("FechaFin cannot be less or equal than FechaInicio");
+                    return null;
+                }
+
+                reservaEntity.FechaInicio = request.FechaInicio;
+                reservaEntity.FechaFin = request.FechaFin;
 
                 var reserva = await _reservaRepository.UpdateReservaAsync(reservaEntity);
 
@@ -205,8 +224,43 @@
                 return new()
                 {
                     Id = reserva.Id,
-                    Cliente = new() { Cedula = reserva.CedulaUsuario },
-                    Vehiculo = new() { Placa = reserva.PlacaVehiculo },
+                    Estado = (EstadosReserva)reserva.IdEstadoReserva,
+                    FechaInicio = reserva.FechaInicio,
+                    FechaFin = reserva.FechaFin
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<Reserva?> ChangeEstadoReservaAsync(int id, EstadosReserva estado)
+        {
+            try
+            {
+                var reservaEntity = await _reservaRepository.GetReservaAsync(id);
+
+                if (reservaEntity is null)
+                {
+                    _logger.LogError("Could not find reserva to change estado");
+                    return null;
+                }
+
+                if (estado > 0) reservaEntity.IdEstadoReserva = (int)estado;
+
+                var reserva = await _reservaRepository.UpdateReservaAsync(reservaEntity);
+
+                if (reserva is null)
+                {
+                    _logger.LogError("Could not change estado reserva");
+                    return null;
+                }
+
+                return new()
+                {
+                    Id = reserva.Id,
                     Estado = (EstadosReserva)reserva.IdEstadoReserva,
                     FechaInicio = reserva.FechaInicio,
                     FechaFin = reserva.FechaFin

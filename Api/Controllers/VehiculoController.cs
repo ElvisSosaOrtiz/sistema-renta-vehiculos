@@ -1,10 +1,13 @@
 ﻿namespace Api.Controllers
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using ServiceContracts;
+    using Shared.Enums;
     using Shared.Routing;
     using Shared.VehiculoController.Request;
 
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [Route(VehiculoControllerRoutes.Root)]
     [ApiController]
     public class VehiculoController : ControllerBase
@@ -17,7 +20,7 @@
         }
 
         [HttpGet]
-        public IActionResult GetVehiculos([FromBody] RequestOfSearchVehiculos? request = null)
+        public IActionResult GetVehiculos(RequestOfSearchVehiculos? request = null)
         {
             var result = _vehiculoService.GetVehiculos(request);
 
@@ -36,6 +39,7 @@
             return Ok(result);
         }
 
+        [Authorize(Roles = nameof(UserRoles.Administrador))]
         [HttpPost]
         public async Task<IActionResult> CreateVehiculo([FromBody] RequestOfCreateVehiculo request)
         {
@@ -46,6 +50,7 @@
             return Ok(result);
         }
 
+        [Authorize(Roles = nameof(UserRoles.Administrador))]
         [HttpPut("{placa}")]
         public async Task<IActionResult> UpdateVehiculo(string placa, [FromBody] RequestOfUpdateVehiculo request)
         {
@@ -56,6 +61,7 @@
             return Ok(result);
         }
 
+        [Authorize(Roles = nameof(UserRoles.Administrador))]
         [HttpDelete("{placa}")]
         public async Task<IActionResult> DeleteVehiculo(string placa)
         {

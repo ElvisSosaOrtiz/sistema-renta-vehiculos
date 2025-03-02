@@ -10,8 +10,8 @@
         public int Id { get; set; }
 
         [Required]
-        public string CedulaUsuario { get; set; } = null!;
-        [ForeignKey(nameof(CedulaUsuario))]
+        public string UserId { get; set; } = null!;
+        [ForeignKey(nameof(UserId))]
         public UsuarioEntity Cliente { get; set; } = null!;
 
         [Required]

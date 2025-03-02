@@ -4,7 +4,6 @@
 
     public class RequestOfCreateReserva
     {
-        public required string CedulaCliente { get; set; }
         public required string PlacaVehiculo { get; set; }
         public required EstadosReserva EstadoReserva { get; set; }
         public required float CostoTotal { get; set; }
