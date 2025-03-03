@@ -1,14 +1,36 @@
 ﻿namespace Shared.AuthController.Request
 {
+    using System.ComponentModel;
+    using System.ComponentModel.DataAnnotations;
+
     public class RequestOfRegisterUsuario
     {
-        public required string Cedula { get; set; }
-        public required string Nombre { get; set; }
-        public required string Apellido { get; set; }
-        public required string UserName { get; set; }
-        public required string Telefono { get; set; }
-        public required string Direccion { get; set; }
-        public required string Correo { get; set; }
-        public required string Password { get; set; }
+        [Required(ErrorMessage = "La cédula es obligatoria.")]
+        public string Cedula { get; set; } = null!;
+
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        public string Nombre { get; set; } = null!;
+
+        [Required(ErrorMessage = "El apellido es obligatorio.")]
+        public string Apellido { get; set; } = null!;
+
+        [Required(ErrorMessage = "El username es obligatorio.")]
+        public string UserName { get; set; } = null!;
+
+        [Required(ErrorMessage = "El teléfono es obligatorio.")]
+        [Phone]
+        public string Telefono { get; set; } = null!;
+
+        [Required(ErrorMessage = "La dirección es obligatoria.")]
+        public string Direccion { get; set; } = null!;
+
+        [Required(ErrorMessage = "El correo es obligatorio.")]
+        [EmailAddress]
+        public string Correo { get; set; } = null!;
+
+        [Required(ErrorMessage = "La contraseña es obligatoria.")]
+        [PasswordPropertyText(true)]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = null!;
     }
 }

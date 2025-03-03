@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Shared.AuthController.Request;
+using Shared.AuthController.Response;
 using Shared.Enums;
 using Shared.Routing;
 using System.IdentityModel.Tokens.Jwt;
@@ -33,7 +34,7 @@ namespace Api.Controllers
             var existingUser = _userManager.Users
                 .Where(user => user.Email == request.Correo || user.Cedula == request.Cedula)
                 .FirstOrDefault();
-            if (existingUser is not null) return BadRequest("There is already an existing user with this email or cedula");
+            if (existingUser is not null) return BadRequest("Algunos datos introducidos como el correo o la cédula ya existen");
 
             var usuario = new UsuarioEntity
             {
@@ -48,9 +49,13 @@ namespace Api.Controllers
             };
             var result = await _userManager.CreateAsync(usuario, request.Password);
 
-            if (!result.Succeeded) return BadRequest(result.Errors);
+            if (!result.Succeeded) return BadRequest(result.Errors.Select(error => new ResponseOfRegisterError
+            {
+                Code = error.Code,
+                Description = error.Description
+            }).ToList());
 
-            await _userManager.AddToRoleAsync(usuario, nameof(UserRoles.Administrador));
+            await _userManager.AddToRoleAsync(usuario, nameof(UserRoles.Cliente));
 
             return Ok(new { message = "User registered successfully!" });
         }
@@ -70,7 +75,7 @@ namespace Api.Controllers
             usuario.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
             await _userManager.UpdateAsync(usuario);
 
-            return Ok(new {
+            return Ok(new ResponseOfGetToken {
                 Token = accessToken,
                 RefreshToken = refreshToken
             });
@@ -96,7 +101,7 @@ namespace Api.Controllers
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
             await _userManager.UpdateAsync(user);
 
-            return Ok(new
+            return Ok(new ResponseOfGetToken
             {
                 Token = newAccessToken,
                 RefreshToken = newRefreshToken
@@ -137,6 +142,7 @@ namespace Api.Controllers
             {
                 new Claim(JwtRegisteredClaimNames.Sub, usuario.Id),
                 new Claim(JwtRegisteredClaimNames.NameId, usuario.Cedula),
+                new Claim(JwtRegisteredClaimNames.Name, $"{usuario.Nombre} {usuario.Apellido}"),
                 new Claim(JwtRegisteredClaimNames.Email, usuario.Email!),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };

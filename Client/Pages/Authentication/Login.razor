@@ -1,0 +1,30 @@
+﻿@page "/login"
+@layout AuthenticationLayout
+
+<div class="container d-flex flex-column align-items-center justify-content-center h-100">
+    <h1 class="fw-bold mb-5">Sistema de Renta de Vehículos</h1>
+    <div class="login p-5 shadow-lg">
+        <h3>Iniciar sesión</h3>
+
+        <EditForm Model="_loginRequest" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label">Correo:</label>
+                <InputText class="form-control" @bind-Value="_loginRequest.Email" />
+                <ValidationMessage For="() => _loginRequest.Email" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Contraseña:</label>
+                <InputText class="form-control" @bind-Value="_loginRequest.Password" type="password" />
+                <ValidationMessage For="() => _loginRequest.Password" class="text-danger" />
+            </div>
+
+            <p class="mb-1 text-danger @_displayErrorClass">@_errorMessage</p>
+
+            <button class="btn btn-primary w-100" type="submit">Iniciar sesión</button>
+        </EditForm>
+        <label class="mt-2 text-center w-100">¿No tienes una cuenta? <a href="/register">Regístrate aquí</a></label>
+    </div>
+</div>

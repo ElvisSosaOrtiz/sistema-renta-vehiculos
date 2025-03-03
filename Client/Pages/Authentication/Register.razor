@@ -1,0 +1,68 @@
+﻿@page "/register"
+@using BlazorInputMask
+@using Client.Routing
+@layout AuthenticationLayout
+
+<div class="container d-flex flex-column align-items-center justify-content-center">
+    <h1 class="fw-bold mb-5">Sistema de Renta de Vehículos</h1>
+    <div class="register p-5 shadow-lg">
+        <h3>Crear cuenta</h3>
+
+        <EditForm Model="_registerRequest" OnValidSubmit="HandleRegister">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label">Cedula:</label>
+                <InputMask class="form-control" data-mask="000-0000000-0" @bind-Value="_registerRequest.Cedula" />
+                <ValidationMessage For="() => _registerRequest.Cedula" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Nombre:</label>
+                <InputText class="form-control" @bind-Value="_registerRequest.Nombre" />
+                <ValidationMessage For="() => _registerRequest.Nombre" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Apellido:</label>
+                <InputText class="form-control" @bind-Value="_registerRequest.Apellido" />
+                <ValidationMessage For="() => _registerRequest.Apellido" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Nombre de usuario:</label>
+                <InputText class="form-control" @bind-Value="_registerRequest.UserName" />
+                <ValidationMessage For="() => _registerRequest.UserName" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Teléfono:</label>
+                <InputMask class="form-control" data-mask="+1 (000) 000-0000" @bind-Value="_registerRequest.Telefono" />
+                <ValidationMessage For="() => _registerRequest.Telefono" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Dirección:</label>
+                <InputText class="form-control" @bind-Value="_registerRequest.Direccion" />
+                <ValidationMessage For="() => _registerRequest.Direccion" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Correo:</label>
+                <InputText class="form-control" @bind-Value="_registerRequest.Correo" />
+                <ValidationMessage For="() => _registerRequest.Correo" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Contraseña:</label>
+                <InputText class="form-control" @bind-Value="_registerRequest.Password" type="password" />
+                <ValidationMessage For="() => _registerRequest.Password" class="text-danger" />
+            </div>
+
+            <p class="mb-1 text-danger @_displayErrorClass">@_errorMessage</p>
+
+            <button class="btn btn-primary w-100 mb-3" type="submit">Registrarse</button>
+            <button class="btn btn-outline-primary w-100" @onclick="() => NavManager.NavigateTo(ClientRoutes.LoginRoute)">Iniciar sesión</button>
+        </EditForm>
+    </div>
+</div>

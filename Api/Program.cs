@@ -9,7 +9,6 @@ using RepositoryContracts;
 using ServiceContracts;
 using Services;
 using Shared.Enums;
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,6 +57,16 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ClienteOnly", policy => policy.RequireRole(nameof(UserRoles.Cliente)));
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorClient", policy =>
+    {
+        policy.WithOrigins(builder.Configuration["BlazorClientBaseUrl"]!)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services
     .AddScoped<IVehiculoRepository, VehiculoRepository>()
     .AddScoped<IReservaRepository, ReservaRepository>()
@@ -79,6 +88,8 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseCors("AllowBlazorClient");
 
 app.MapControllers();
 

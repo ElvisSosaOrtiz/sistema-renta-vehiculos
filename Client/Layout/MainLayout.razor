@@ -1,12 +1,18 @@
-﻿@inherits LayoutComponentBase
-<div class="page">
+﻿@using Client.LocalServices
+@using Client.Routing
+@using System.Security.Claims
+
+@inherits LayoutComponentBase
+
+<div class="page h-100">
     <div class="sidebar">
         <NavMenu />
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        <div class="top-row px-4 d-flex justify-content-between">
+            <label>Bienvenido, @Nombre!</label>
+            <button class="btn btn-outline-primary" @onclick="HandleLogout">Cerrar sesión</button>
         </div>
 
         <article class="content px-4">
@@ -14,3 +20,26 @@
         </article>
     </main>
 </div>
+
+@code {
+    [Inject] public NavigationManager NavManager { get; set; } = null!;
+    [Inject] public CustomAuthStateProvider AuthStateProvider { get; set; } = null!;
+    [Inject] public AuthService AuthService { get; set; } = null!;
+
+    private string Nombre = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        bool isAuthenticated = authState.User.Identity!.IsAuthenticated;
+        Console.WriteLine($"Is Authenticated: {isAuthenticated}");
+
+        if (isAuthenticated) Nombre = authState.User.Claims.First(claim => claim.Type == "name").Value;
+    }
+
+    private async Task HandleLogout()
+    {
+        await AuthService.Logout();
+        NavManager.NavigateTo(ClientRoutes.LoginRoute);
+    }
+}
