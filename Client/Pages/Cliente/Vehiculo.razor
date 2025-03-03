@@ -1,0 +1,56 @@
+﻿@page "/vehiculos/{Placa}"
+@layout MainLayout
+@attribute [Authorize(Roles = nameof(UserRoles.Cliente))]
+
+<table class="table table-bordered table-responsive">
+    <tr>
+        <th scope="row">Placa</th>
+        <td>@_vehiculo.Placa</td>
+    </tr>
+    <tr>
+        <th scope="row">Marca</th>
+        <td>@_vehiculo.Marca</td>
+    </tr>
+    <tr>
+        <th scope="row">Modelo</th>
+        <td>@_vehiculo.Modelo</td>
+    </tr>
+    <tr>
+        <th scope="row">Año</th>
+        <td>@_vehiculo.Year</td>
+    </tr>
+    <tr>
+        <th scope="row">Estado</th>
+        <td>@(Enum.GetName<EstadosVehiculo>(_vehiculo.Estado))</td>
+    </tr>
+    <tr>
+        <th scope="row">Precio por día</th>
+        <td>RD@(FormatPriceNumberToMoneyString(_vehiculo.PrecioPorDia))</td>
+    </tr>
+</table>
+
+<EditForm Model="_reservaRequest" OnValidSubmit="CreateNewReservaAsync">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label class="form-label">Fecha inicio:</label>
+        <InputDate class="form-control" @bind-Value="_reservaRequest.FechaInicio" @oninput="HandlePriceCalculationAsync" />
+        <ValidationMessage For="() => _reservaRequest.FechaInicio" class="text-danger" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Contraseña:</label>
+        <InputDate class="form-control" @bind-Value="_reservaRequest.FechaFin" @oninput="HandlePriceCalculationAsync" />
+        <ValidationMessage For="() => _reservaRequest.FechaFin" class="text-danger" />
+    </div>
+
+    <p class="mb-1 text-danger @_displayErrorClass">@_errorMessage</p>
+
+    <div>
+        <button class="btn btn-outline-primary" @onclick="() => NavManager.NavigateTo(ClientRoutes.VehiculoListRoute)">Volver</button>
+        <button class="btn btn-primary @(_vehiculo.Estado == EstadosVehiculo.Disponible ? string.Empty : "disabled")" type="submit">Reservar</button>
+    </div>
+
+    <h3 class="w-100 text-center">@_dateDifference días</h3>
+    <h3 class="w-100 text-center">RD@(FormatPriceNumberToMoneyString(_reservaRequest.CostoTotal))</h3>
+</EditForm>

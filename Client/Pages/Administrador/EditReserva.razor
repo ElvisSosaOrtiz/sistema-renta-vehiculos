@@ -1,0 +1,15 @@
+﻿@page "/admin-edit-estado-reserva/{Id:int}"
+@layout MainLayout
+@attribute [Authorize(Roles = nameof(UserRoles.Administrador))]
+
+<label class="form-label">Estado de la reserva:</label>
+<select class="form-control" @bind="Estado">
+    @foreach (var estado in Enum.GetValues<EstadosReserva>())
+    {
+        <option value="@estado">@(Enum.GetName<EstadosReserva>(estado))</option>
+    }
+</select>
+<div class="mt-3">
+    <a href="/admin-reservas" class="btn btn-outline-primary">Volver</a>
+    <button class="btn btn-primary" @onclick="ChangeEstadoReservaAsync">Cambiar estado</button>
+</div>

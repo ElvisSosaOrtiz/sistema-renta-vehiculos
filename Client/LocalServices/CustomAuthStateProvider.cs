@@ -45,6 +45,8 @@
                 }
             }
 
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
             var identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
             var user = new ClaimsPrincipal(identity);
             return new AuthenticationState(user);

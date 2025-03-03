@@ -19,7 +19,7 @@
             _displayErrorClass = "d-none";
             var success = await AuthService.Login(_loginRequest);
 
-            if (success) NavManager.NavigateTo(ClientRoutes.VehiculosRoute);
+            if (success) NavManager.NavigateTo(ClientRoutes.VehiculoListRoute);
             else
             {
                 _errorMessage = "Correo o contraseña incorrectos. Intente de nuevo.";

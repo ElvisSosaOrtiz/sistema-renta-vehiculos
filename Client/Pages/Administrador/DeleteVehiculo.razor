@@ -1,0 +1,7 @@
+﻿@page "/admin-delete-vehiculo/{Placa}"
+@layout MainLayout
+@attribute [Authorize(Roles = nameof(UserRoles.Administrador))]
+
+<h3>¿Estás seguro de remover el vehículo @NombreVehiculo?</h3>
+<a href="/vehiculos" class="btn btn-outline-primary">Volver</a>
+<button class="btn btn-danger" @onclick="RemoveVehiculoAsync">Borrar</button>

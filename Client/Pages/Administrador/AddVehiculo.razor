@@ -1,0 +1,52 @@
+﻿@page "/admin-add-vehiculo"
+@layout MainLayout
+@attribute [Authorize(Roles = nameof(UserRoles.Administrador))]
+
+<EditForm Model="_request" OnValidSubmit="HandleCreateVehiculoAsync">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label class="form-label">Placa:</label>
+        <InputText class="form-control" @bind-Value="_request.Placa" />
+        <ValidationMessage For="() => _request.Placa" class="text-danger" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Marca:</label>
+        <InputText class="form-control" @bind-Value="_request.Marca" />
+        <ValidationMessage For="() => _request.Marca" class="text-danger" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Modelo:</label>
+        <InputText class="form-control" @bind-Value="_request.Modelo" />
+        <ValidationMessage For="() => _request.Modelo" class="text-danger" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Año:</label>
+        <InputNumber class="form-control" @bind-Value="_request.Year" />
+        <ValidationMessage For="() => _request.Year" class="text-danger" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Estado:</label>
+        <InputSelect class="form-control" @bind-Value="_request.Estado">
+            @foreach (var estado in Enum.GetValues<EstadosVehiculo>())
+            {
+                <option value="@estado">@(Enum.GetName<EstadosVehiculo>(estado))</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="() => _request.Estado" class="text-danger" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Precio por día:</label>
+        <InputNumber class="form-control" @bind-Value="_request.PrecioPorDia" />
+        <ValidationMessage For="() => _request.PrecioPorDia" class="text-danger" />
+    </div>
+
+    <p class="mb-1 text-danger @_displayErrorClass">@_errorMessage</p>
+
+    <button class="btn btn-primary w-100 my-3" type="submit">Crear vehículo</button>
+</EditForm>

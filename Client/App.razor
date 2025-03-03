@@ -5,7 +5,11 @@
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(AuthenticationLayout)" />
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(AuthenticationLayout)">
+                <NotAuthorized>
+                    <Login />
+                </NotAuthorized>
+            </AuthorizeRouteView>
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>
@@ -24,6 +28,7 @@
     protected override async Task OnInitializedAsync()
     {
         bool isAuthenticated = (await AuthStateProvider.GetAuthenticationStateAsync()).User.Identity!.IsAuthenticated;
-        if (isAuthenticated) NavManager.NavigateTo(ClientRoutes.VehiculosRoute);
+        if (isAuthenticated) NavManager.NavigateTo(ClientRoutes.VehiculoListRoute);
+        else NavManager.NavigateTo(ClientRoutes.LoginRoute);
     }
 }
