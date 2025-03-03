@@ -24,9 +24,6 @@
         public IActionResult GetReservas([FromQuery] string cedula)
         {
             var result = _reservaService.GetReservas(cedula);
-
-            if (result is null) return NoContent();
-
             return Ok(result);
         }
 
@@ -66,7 +63,7 @@
 
         [Authorize(Roles = nameof(UserRoles.Administrador))]
         [HttpPut(ReservaControllerRoutes.EstadoReserva + "/{id}")]
-        public async Task<IActionResult> ChangeEstadoReserva(int id, [FromQuery] EstadosReserva estado)
+        public async Task<IActionResult> ChangeEstadoReserva(int id, [FromBody] EstadosReserva estado)
         {
             var result = await _reservaService.ChangeEstadoReservaAsync(id, estado);
 

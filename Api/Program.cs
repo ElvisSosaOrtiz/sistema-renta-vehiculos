@@ -63,11 +63,13 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(builder.Configuration["BlazorClientBaseUrl"]!)
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
 builder.Services
+    .AddScoped<IAuthService, AuthService>()
     .AddScoped<IVehiculoRepository, VehiculoRepository>()
     .AddScoped<IReservaRepository, ReservaRepository>()
     .AddScoped<IVehiculoService, VehiculoService>()
@@ -81,15 +83,13 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-//app.Services.SeedRolesAsync().Wait();
-
 app.UseHttpsRedirection();
+
+app.UseCors("AllowBlazorClient");
 
 app.UseAuthentication();
 
 app.UseAuthorization();
-
-app.UseCors("AllowBlazorClient");
 
 app.MapControllers();
 

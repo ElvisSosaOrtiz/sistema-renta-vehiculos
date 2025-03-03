@@ -20,12 +20,9 @@
         }
 
         [HttpGet]
-        public IActionResult GetVehiculos(RequestOfSearchVehiculos? request = null)
+        public IActionResult GetVehiculos([FromQuery] RequestOfSearchVehiculos? request = null)
         {
             var result = _vehiculoService.GetVehiculos(request);
-
-            if (result is null) return NoContent();
-
             return Ok(result);
         }
 

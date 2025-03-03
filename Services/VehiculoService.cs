@@ -28,7 +28,7 @@
             {
                 var vehiculos = _vehiculoRepository.GetVehiculos();
 
-                if (vehiculos is null || !vehiculos.Any()) return null;
+                if (vehiculos is null || !vehiculos.Any()) return new();
 
                 if (request is not null)
                 {
@@ -44,7 +44,7 @@
                     if (request.Estado > 0)
                         vehiculos = vehiculos.Where(vehiculo => vehiculo.EstadoVehiculo.Nombre.Contains(Enum.GetName(request.Estado)!));
 
-                    if (!vehiculos.Any()) return null;
+                    if (!vehiculos.Any()) return new();
                 }
 
                 return new()
@@ -157,8 +157,8 @@
 
                 if (!string.IsNullOrEmpty(request.Marca)) vehiculoEntity.Marca = request.Marca;
                 if (!string.IsNullOrEmpty(request.Modelo)) vehiculoEntity.Modelo = request.Modelo;
-                if (request.Year > 0) vehiculoEntity.Year = request.Year;
-                if (request.Estado > 0) vehiculoEntity.EstadoVehiculoId = (int)request.Estado;
+                if (request.Year >= 1970) vehiculoEntity.Year = request.Year;
+                if (request.Estado > 0 && (int)request.Estado <= 3) vehiculoEntity.EstadoVehiculoId = (int)request.Estado;
                 if (request.PrecioPorDia > 0) vehiculoEntity.PrecioPorDia = request.PrecioPorDia;
 
                 var vehiculo = await _vehiculoRepository.UpdateVehiculoAsync(vehiculoEntity);

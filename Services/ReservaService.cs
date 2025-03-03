@@ -31,7 +31,7 @@
             {
                 var reservas = _reservaRepository.GetReservas();
 
-                if (reservas is null || !reservas.Any()) return null;
+                if (reservas is null || !reservas.Any()) return new();
 
                 return new()
                 {
@@ -122,22 +122,6 @@
         {
             try
             {
-                var existingReserva = GetReservas(cedula)?.Reservas
-                    .FirstOrDefault(reserva => reserva.Vehiculo.Placa == request.PlacaVehiculo);
-
-                var vehiculo = await _vehiculoRepository.GetVehiculoAsync(request.PlacaVehiculo);
-                if (vehiculo is null)
-                {
-                    _logger.LogError("This vehiculo does not exist");
-                    return null;
-                }
-
-                if (existingReserva is not null)
-                {
-                    _logger.LogError("Reserva of this vehiculo already exists");
-                    return null;
-                }
-
                 if (request.FechaInicio.ToDateTime(TimeOnly.FromDateTime(DateTime.Now)) <= DateTime.Now)
                 {
                     _logger.LogError("FechaInicio should be greater than today");
@@ -159,6 +143,17 @@
                     FechaInicio = request.FechaInicio,
                     FechaFin = request.FechaFin
                 };
+                
+                var vehiculo = await _vehiculoRepository.GetVehiculoAsync(request.PlacaVehiculo);
+
+                if (vehiculo is null)
+                {
+                    _logger.LogError("Could not find vehiculo to change estado");
+                    return null;
+                }
+
+                vehiculo.EstadoVehiculoId = (int)EstadosVehiculo.Rentado;
+                await _vehiculoRepository.UpdateVehiculoAsync(vehiculo);
 
                 var reserva = await _reservaRepository.CreateReservaAsync(reservaEntity);
 
